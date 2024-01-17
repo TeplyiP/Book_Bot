@@ -1,7 +1,6 @@
 import os
 import sys
 
-BOOK_PATH = 'books/book.txt'
 PAGE_SIZE = 1050
 
 book: dict[int, str] = {}
@@ -9,7 +8,7 @@ book: dict[int, str] = {}
 
 # Функция, возвращающая строку с текстом страницы и ее размер
 def _get_part_text(text: str, start: int, size: int)->tuple[str,int]:
-    simbols={',','.','!',':','?',';'}
+    simbols={',','.','!',':','?',';',' '}
     substr=text[start:start+size]
     count:int = 0
     for i in reversed(substr):
@@ -17,6 +16,7 @@ def _get_part_text(text: str, start: int, size: int)->tuple[str,int]:
             return substr[:len(substr)-count],len(substr[:len(substr)-count])
         else:
             count=count+1
+    return substr,len(substr)
 
 
 
@@ -24,16 +24,17 @@ def _get_part_text(text: str, start: int, size: int)->tuple[str,int]:
 
 # Функция, формирующая словарь книги
 def prepare_book(path: str) -> None:
-    f = open(path, 'r',encoding="utf-8")
+    f = open(path, 'r')
     text=f.read()
     counter:int = 0
     page:int = 1
     while counter<len(text):
         temp_lulip=_get_part_text(text,counter,PAGE_SIZE)
-        book[page]=temp_lulip[0].lstrip()
+        try:
+            book[page]=temp_lulip[0].lstrip()
+        except TypeError:
+            continue
         page=page+1
         counter=counter+temp_lulip[1]
     f.close()
 
-# Вызов функции prepare_book для подготовки книги из текстового файла
-prepare_book(os.path.join(sys.path[0], os.path.normpath(BOOK_PATH)))
